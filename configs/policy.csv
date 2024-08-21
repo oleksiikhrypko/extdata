@@ -5,6 +5,7 @@ p, *, /graph/query, Connection:Upgrade;Upgrade:websocket
 p, *, /graph/query, Connection:upgrade;Upgrade:websocket
 p, *, /api/world-logo/,
 p, *, /api/world-logo/{id},
+p, *, /graph/query,
 
 p, idea:read, /api/world-logo/,
 p, idea:read, /api/world-logo/{id},
