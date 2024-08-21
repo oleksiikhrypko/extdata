@@ -3,8 +3,10 @@ p, *, /health,
 p, *, /graph,
 p, *, /graph/query, Connection:Upgrade;Upgrade:websocket
 p, *, /graph/query, Connection:upgrade;Upgrade:websocket
-p, *, /api/worldlogo/index,
+p, *, /api/world-logo/,
+p, *, /api/world-logo/{id},
 
-p, idea:read, /api/worldlogo/search,
+p, idea:read, /api/world-logo/,
+p, idea:read, /api/world-logo/{id},
 p, idea:query, /graph/query,
 

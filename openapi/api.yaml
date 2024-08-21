@@ -9,6 +9,60 @@ servers:
     description: Dev server
 paths:
 #idea
+  /world-logo/:
+    get:
+      tags:
+        - world-logo
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/offset-key'
+        - $ref: '#/components/parameters/api-key'
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: The search query
+        - in: query
+          required: false
+          name: ids
+          description: The ID's of the world logos
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          required: false
+          name: sort-by
+          description: The field to sort by
+          schema:
+            type: string
+            enum:
+              - id
+              - name
+        - in: query
+          required: false
+          name: sort-order
+          description: The order to sort by
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
+      operationId: GetWorldLogos
+      summary: Get world logo by id
+      description: Returns a single world logo record
+      security:
+      - BearerAuth: []
+      responses:
+        200:
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worldLogo'
+        500:
+          $ref: '#/components/responses/errorResponse'
   /world-logo/{id}:
     parameters:
       - $ref: '#/components/parameters/idParam'
@@ -27,7 +81,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/worldLogo'
-        
+
         404:
           $ref: '#/components/responses/notFoundResponse'
         500:
@@ -82,6 +136,13 @@ components:
           format: date-time
           
   parameters:
+    api-key:
+      in: header
+      name: X-API-KEY
+      schema:
+        type: string
+      required: true
+      description: API key to access the API
     idParam:
       in: path
       name: id
@@ -89,6 +150,30 @@ components:
       required: true
       schema:
         type: string
+    limit:
+      in: query
+      name: limit
+      required: true
+      schema:
+        type: integer
+        format: uint64
+        maximum: 100
+        minimum: 1
+        default: 25
+      description: The number of items to return
+    offset:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        format: uint64
+      description: The number of items to skip before starting to collect the result set, has less priority than offset-key
+    offset-key:
+      in: query
+      name: offset-key
+      schema:
+        type: string
+      description: The key to use for offsetting the result set, has more priority than offset
 
   responses:
     htmlResponse:

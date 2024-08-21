@@ -87,6 +87,17 @@ func ToGraphWorldLogo(input WorldLogo) graph.WorldLogo {
 	}
 }
 
+func ToAPIWorldLogos(input []WorldLogo) []api.WorldLogo {
+	if len(input) == 0 {
+		return nil
+	}
+	res := make([]api.WorldLogo, len(input))
+	for i, item := range input {
+		res[i] = ToAPIWorldLogo(item)
+	}
+	return res
+}
+
 func ToAPIWorldLogo(input WorldLogo) api.WorldLogo {
 	return api.WorldLogo{
 		Id:        input.Id,

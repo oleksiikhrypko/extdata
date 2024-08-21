@@ -26,6 +26,18 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// Defines values for GetWorldLogosParamsSortBy.
+const (
+	Id   GetWorldLogosParamsSortBy = "id"
+	Name GetWorldLogosParamsSortBy = "name"
+)
+
+// Defines values for GetWorldLogosParamsSortOrder.
+const (
+	ASC  GetWorldLogosParamsSortOrder = "ASC"
+	DESC GetWorldLogosParamsSortOrder = "DESC"
+)
+
 // Error defines model for error.
 type Error struct {
 	Fields  map[string]interface{} `json:"fields"`
@@ -42,14 +54,59 @@ type WorldLogo struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+// ApiKey defines model for api-key.
+type ApiKey = string
+
 // IdParam defines model for idParam.
 type IdParam = string
+
+// Limit defines model for limit.
+type Limit = uint64
+
+// Offset defines model for offset.
+type Offset = uint64
+
+// OffsetKey defines model for offset-key.
+type OffsetKey = string
 
 // ErrorResponse defines model for errorResponse.
 type ErrorResponse = Error
 
 // NotFoundResponse defines model for notFoundResponse.
 type NotFoundResponse = Error
+
+// GetWorldLogosParams defines parameters for GetWorldLogos.
+type GetWorldLogosParams struct {
+	// Limit The number of items to return
+	Limit Limit `form:"limit" json:"limit"`
+
+	// Offset The number of items to skip before starting to collect the result set, has less priority than offset-key
+	Offset *Offset `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// OffsetKey The key to use for offsetting the result set, has more priority than offset
+	OffsetKey *OffsetKey `form:"offset-key,omitempty" json:"offset-key,omitempty"`
+
+	// Search The search query
+	Search *string `form:"search,omitempty" json:"search,omitempty"`
+
+	// Ids The ID's of the world logos
+	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
+
+	// SortBy The field to sort by
+	SortBy *GetWorldLogosParamsSortBy `form:"sort-by,omitempty" json:"sort-by,omitempty"`
+
+	// SortOrder The order to sort by
+	SortOrder *GetWorldLogosParamsSortOrder `form:"sort-order,omitempty" json:"sort-order,omitempty"`
+
+	// XAPIKEY API key to access the API
+	XAPIKEY ApiKey `json:"X-API-KEY"`
+}
+
+// GetWorldLogosParamsSortBy defines parameters for GetWorldLogos.
+type GetWorldLogosParamsSortBy string
+
+// GetWorldLogosParamsSortOrder defines parameters for GetWorldLogos.
+type GetWorldLogosParamsSortOrder string
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -124,8 +181,23 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// GetWorldLogos request
+	GetWorldLogos(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetWorldLogoById request
 	GetWorldLogoById(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetWorldLogos(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetWorldLogosRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetWorldLogoById(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -138,6 +210,160 @@ func (c *Client) GetWorldLogoById(ctx context.Context, id IdParam, reqEditors ..
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewGetWorldLogosRequest generates requests for GetWorldLogos
+func NewGetWorldLogosRequest(server string, params *GetWorldLogosParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/world-logo/")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, params.Limit); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset", runtime.ParamLocationQuery, *params.Offset); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.OffsetKey != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "offset-key", runtime.ParamLocationQuery, *params.OffsetKey); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Search != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "search", runtime.ParamLocationQuery, *params.Search); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Ids != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortBy != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort-by", runtime.ParamLocationQuery, *params.SortBy); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SortOrder != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "sort-order", runtime.ParamLocationQuery, *params.SortOrder); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		var headerParam0 string
+
+		headerParam0, err = runtime.StyleParamWithLocation("simple", false, "X-API-KEY", runtime.ParamLocationHeader, params.XAPIKEY)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("X-API-KEY", headerParam0)
+
+	}
+
+	return req, nil
 }
 
 // NewGetWorldLogoByIdRequest generates requests for GetWorldLogoById
@@ -217,8 +443,34 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetWorldLogosWithResponse request
+	GetWorldLogosWithResponse(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*GetWorldLogosResponse, error)
+
 	// GetWorldLogoByIdWithResponse request
 	GetWorldLogoByIdWithResponse(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*GetWorldLogoByIdResponse, error)
+}
+
+type GetWorldLogosResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *WorldLogo
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetWorldLogosResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetWorldLogosResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetWorldLogoByIdResponse struct {
@@ -245,6 +497,15 @@ func (r GetWorldLogoByIdResponse) StatusCode() int {
 	return 0
 }
 
+// GetWorldLogosWithResponse request returning *GetWorldLogosResponse
+func (c *ClientWithResponses) GetWorldLogosWithResponse(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*GetWorldLogosResponse, error) {
+	rsp, err := c.GetWorldLogos(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetWorldLogosResponse(rsp)
+}
+
 // GetWorldLogoByIdWithResponse request returning *GetWorldLogoByIdResponse
 func (c *ClientWithResponses) GetWorldLogoByIdWithResponse(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*GetWorldLogoByIdResponse, error) {
 	rsp, err := c.GetWorldLogoById(ctx, id, reqEditors...)
@@ -252,6 +513,39 @@ func (c *ClientWithResponses) GetWorldLogoByIdWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseGetWorldLogoByIdResponse(rsp)
+}
+
+// ParseGetWorldLogosResponse parses an HTTP response from a GetWorldLogosWithResponse call
+func ParseGetWorldLogosResponse(rsp *http.Response) (*GetWorldLogosResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetWorldLogosResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest WorldLogo
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseGetWorldLogoByIdResponse parses an HTTP response from a GetWorldLogoByIdWithResponse call
@@ -297,6 +591,9 @@ func ParseGetWorldLogoByIdResponse(rsp *http.Response) (*GetWorldLogoByIdRespons
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get world logo by id
+	// (GET /world-logo/)
+	GetWorldLogos(ctx echo.Context, params GetWorldLogosParams) error
+	// Get world logo by id
 	// (GET /world-logo/{id})
 	GetWorldLogoById(ctx echo.Context, id IdParam) error
 }
@@ -304,6 +601,87 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// GetWorldLogos converts echo context to params.
+func (w *ServerInterfaceWrapper) GetWorldLogos(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetWorldLogosParams
+	// ------------- Required query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Optional query parameter "offset-key" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset-key", ctx.QueryParams(), &params.OffsetKey)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset-key: %s", err))
+	}
+
+	// ------------- Optional query parameter "search" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "search", ctx.QueryParams(), &params.Search)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter search: %s", err))
+	}
+
+	// ------------- Optional query parameter "ids" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "ids", ctx.QueryParams(), &params.Ids)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter ids: %s", err))
+	}
+
+	// ------------- Optional query parameter "sort-by" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort-by", ctx.QueryParams(), &params.SortBy)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort-by: %s", err))
+	}
+
+	// ------------- Optional query parameter "sort-order" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort-order", ctx.QueryParams(), &params.SortOrder)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort-order: %s", err))
+	}
+
+	headers := ctx.Request().Header
+	// ------------- Required header parameter "X-API-KEY" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-API-KEY")]; found {
+		var XAPIKEY ApiKey
+		n := len(valueList)
+		if n != 1 {
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Expected one value for X-API-KEY, got %d", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-API-KEY", valueList[0], &XAPIKEY, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter X-API-KEY: %s", err))
+		}
+
+		params.XAPIKEY = XAPIKEY
+	} else {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Header parameter X-API-KEY is required, but not found"))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetWorldLogos(ctx, params)
+	return err
 }
 
 // GetWorldLogoById converts echo context to params.
@@ -352,6 +730,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/world-logo/", wrapper.GetWorldLogos)
 	router.GET(baseURL+"/world-logo/:id", wrapper.GetWorldLogoById)
 
 }
@@ -359,19 +738,24 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/7xV3U70NhB9FWvay5CkHyCh3IEo1VZcIIrExbICbzybmCa2a0+WrlZ592qc/cn+tFKr",
-	"6ruLPfbxmTNnJmsobeusQUMBijU46WWLhD6utHriNX8qDKXXjrQ1UMBLjUIrsTudQgKaA05SDQkY2SIU",
-	"oBUk4PGPTntUUJDvMIFQ1thKxqSV41OBvDYV9H3Ph4OzJmB8Hr23/nmzwxulNYSG+FM61+hSMp/sMzCp",
-	"9Qj5R48LKOCHbJ9dNkRDFlGH1w6TmhhCb2QjAvolerE5mICx9GA7o74fFdY3OCz1QqMSHoPtfIniSwZh",
-	"LIkFswG+tkHaqRVr6K1DT3oQcaGxUWEkt51/YkmcV4shyArPlWJctunuYLJFmyWnaF/WN+rRVvaUQ+lR",
-	"Eqp3GfVaWN/yFyhJeEG6ZeAjAkeCrE/jWp3dbmxl36MLz0UHX54JdE79S4ZHEkWrR/hD6mNGyViIgzdP",
-	"9eTaYtl5TavfuMaDkHcoPfrbbkhvHlcPW7K/vr7AsZF+Zk8LqlGQ/R2N+NJUx+XHACXEh3AeF/rPRGBa",
-	"peJt84aQ81LhT98ur67fgNs7Oo0ZDq/uBamJ3OBhbRax+KSp4chEoRT3tpXaiNunSewrXbJCS/RhIJin",
-	"eZpzBaxDI52GAi7jVhJnScw6i9a6YCGztVY971VIp2PpGanzJggpgjZVgyJeFHxReCyt5yKxMWOzThQU",
-	"8AvS69a4d6vJMLBGM+hbnv9v7b7vkP/c8glc5Vd/986OeHYysfoErodM/vni4cgduxCK6aH/prN+lkDo",
-	"2lb61aDkWO/5SsSeIFkFbpB9DWHWJwc/mul5Vvsj2fZH1M8GSjyfh4uHIj7acje/ucN8szFokWUNx2ob",
-	"qLjJb/JMOp1Bnxwj3OPy3P1QZJlWKC/CskwVLtPQrEwVakupthus2S7ZY9DoMMGV5z7Y/x9HmvSz/q8A",
-	"AAD//5Q5GcCMBwAA",
+	"H4sIAAAAAAAC/8xX32/bNhD+VwhuwF5ky22TodBb2qSDtz4ETYFuSI2WFk8SG4lUj6ekRuD/fThKsuRY",
+	"SZNhG/pmkaf7vvv1nXwrU1fVzoIlL5NbWStUFRBgeFK1mV3Bhn9q8CmamoyzMpEn50txBRtBTqg0Be8F",
+	"FSBOzpcykoYNClAaUEbSqgpkIv+cnZwvZ3+c/SUjifC1MQhaJoQNRNKnBVSKQWhTs7EnNDaX220kjT5n",
+	"RocM3hcgjBY7vvMeuVZUDLhGPxGwNJWhaTjbVGtA4TJhCCrPwSNQg7aH/toAbgbs1tVD8Boy1ZQkk+fH",
+	"kcwcVopkIhtj6dcjGclKfTNVU8nk2WIRycrY7inqeRtLkAMG4i7LPDyeub8ytVhD5hCEJ4VkbM7nqStL",
+	"SCnUE8E3JQkPFIlCeVFyoWs0Dg1tBBXKihY1NMl0Ejpa46gPA703nOnu45C67ms8iMxhx6MNYoJ5xWFO",
+	"MX+QdRfW/e2y5eL62lkPYV4A0eG77oQPUmcJLLWzVJcmVRxC/MVzHLcjzz8jZDKRP8XDOMbtrY+D1xZt",
+	"Pw9LS4BWlcIDXgOKzjCS1tEb11j9/1HhkvgaUpMZ0Jx+12AK4kZ5YR2JjNmEunaedtkKooOuBiTTJjEz",
+	"UGo/Srdbf4GUOK4KvFc5TE/uMGaXO8Oo97aKDr3dOCz1W5e7Qw4pgiLQnxTtNaxWBDMyFQw92xO4k5Db",
+	"w3ujJ49Ll7tPQbSmbtt+nLhoav1EhndSFJQxuN+nPmYUjROxh3mYT64tpA0P2AXXuE3kK1AIeNK04a3D",
+	"05ue7O8f3su7jXTGPR1mmNwVWHFjqAiPn1tXQnwWNUJmvkUC5vlcfOwwhFqnGp49f3F0/FHO+7Flhi3q",
+	"kJCCqG572NgsFJ8MlXyz1KDEqauUsbzMwlyZlDN0Dehbgov5Yr7gCrgarKqNTOSLcBSF1ROijkNrzTiR",
+	"MT/nU8L8LuwOL5TwxuYliPCS4JcEQuqQC8RNGQZ1qWUifwP60DetD4DDtr6cntzBJG730Tb6rmEnjY+2",
+	"DDr5COv+c4JNJ+QDFKaF6JV4SpZbkwcledL18vQXz9uP+2jIsr8HxWi/BxF25uQQdgcKUW3uww4CFDau",
+	"QxLre0NzSLP1/roBy+t+PKqr6HEBO9Q8RY8CDbaTuCcXr2UkT88uXk8Br+4sv+eLxb+2ZwZp/se7JpLH",
+	"LaEpnB3xeH9lj1UsjNRYvy5XHLNvqkrhpp3G8cyuNyIUilTO4ygHDZAr9jsWhVujt/+VMLzaLNuP3h+5",
+	"NkeLo+/X5uAz5gcr6lMFuP8zs121lPijrX1xP4lvXbr7qOO1i2W3tZI4LvmucJ6Sl4uXC5bUeEJPT+F6",
+	"6n2fxLHRoGb+Op1ruJ77cmNzXziaG9f5Wu2Cves0dJjgynf/9DoVGeVku9r+HQAA//92n0VtUg4AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -76,8 +76,8 @@ func GetWorldLogos(ctx context.Context, ops model.WorldLogosQueryOptions, sort [
 	}
 
 	var (
-		qs   []string // query strings
-		args []any    // query args
+		qs   = []string{"1=1"} // query strings
+		args []any             // query args
 		q    string
 		qa   []any
 	)
