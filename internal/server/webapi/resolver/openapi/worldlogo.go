@@ -3,6 +3,7 @@ package openapi
 import (
 	"net/http"
 
+	"ext-data-domain/internal/model"
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 
 	"github.com/Slyngshot-Team/packages/auth"
@@ -23,6 +24,6 @@ func (h Handler) GetWorldLogoById(c echo.Context, id api.IdParam) error {
 		return handleError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, data)
+	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(data))
 
 }

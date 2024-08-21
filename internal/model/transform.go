@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	graph "ext-data-domain/internal/server/webapi/api/graph/model"
+	api "ext-data-domain/internal/server/webapi/api/openapi"
 
 	"github.com/Slyngshot-Team/packages/storage/psql"
 )
@@ -79,6 +80,16 @@ func ToGraphWorldLogos(input []WorldLogo) []graph.WorldLogo {
 func ToGraphWorldLogo(input WorldLogo) graph.WorldLogo {
 	return graph.WorldLogo{
 		ID:        input.Id,
+		Name:      input.Name,
+		LogoPath:  input.LogoPath,
+		CreatedAt: input.CreatedAt,
+		UpdatedAt: input.UpdatedAt,
+	}
+}
+
+func ToAPIWorldLogo(input WorldLogo) api.WorldLogo {
+	return api.WorldLogo{
+		Id:        input.Id,
 		Name:      input.Name,
 		LogoPath:  input.LogoPath,
 		CreatedAt: input.CreatedAt,

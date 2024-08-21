@@ -22,7 +22,12 @@ paths:
       - BearerAuth: []
       responses:
         200:
-          $ref: '#/components/responses/htmlResponse'
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worldLogo'
+        
         404:
           $ref: '#/components/responses/notFoundResponse'
         500:
@@ -51,7 +56,31 @@ components:
           type: string
         fields:
           type: object
-
+    worldLogo:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - logo_path
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        logo_path:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          
   parameters:
     idParam:
       in: path
