@@ -18,12 +18,12 @@ func (h Handler) GetWorldLogoById(c echo.Context, id api.IdParam) error {
 		ctx = log.CtxWithValues(ctx, "user_id", userId)
 	}
 
-	data, err := h.worldlogoService.GetWorldLogoById(ctx, id)
+	rec, err := h.worldlogoService.GetWorldLogoById(ctx, id)
 	if err != nil {
 		return handleError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(data))
+	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(rec))
 }
 
 func (h Handler) GetWorldLogos(c echo.Context, params api.GetWorldLogosParams) error {
@@ -60,4 +60,35 @@ func (h Handler) GetWorldLogos(c echo.Context, params api.GetWorldLogosParams) e
 	}
 
 	return c.JSON(http.StatusOK, model.ToAPIWorldLogos(recs))
+}
+
+func (h Handler) CreateWorldLogo(c echo.Context, params api.CreateWorldLogoParams) error {
+	ctx := c.Request().Context()
+	if userId, err := auth.GetUserID(ctx); err != nil {
+		ctx = log.CtxWithValues(ctx, "user_id", userId)
+	}
+
+	var input api.WorldLogoInput
+	err := c.Bind(&input)
+	if err != nil {
+		return bindError(c, err)
+	}
+
+	id, err := h.worldlogoService.SaveWorldLogo(ctx, params.XAPIKEY, model.WorldLogoInput{
+		Id:            input.Id,
+		Name:          input.Name,
+		LogoPath:      input.LogoPath,
+		LogoBase64Str: input.LogoBase64Str,
+		SrcKey:        input.SrcKey,
+	})
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	rec, err := h.worldlogoService.GetWorldLogoById(ctx, id)
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(rec))
 }

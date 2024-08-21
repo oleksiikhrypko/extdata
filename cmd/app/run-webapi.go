@@ -55,7 +55,7 @@ func startWebApi(ctx context.Context, svcName string) error {
 
 	// init worldlogo service
 	var worldlogoSvcCfg service.WorldLogoServiceConfig
-	err = config.Unmarshal("idea-service", &worldlogoSvcCfg)
+	err = config.Unmarshal("world-logo-service", &worldlogoSvcCfg)
 	if err != nil {
 		log.Error(ctx, err, "failed on unmarshal 'idea-service' config")
 		return err

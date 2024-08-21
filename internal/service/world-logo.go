@@ -70,13 +70,21 @@ func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, inp
 		return "", ErrForbidden
 	}
 
-	ctx = log.CtxWithValues(ctx, "action", "SaveWorldLogo", "id", input.Id, "name", input.Name, "key", input.SrcKey)
-	ctx = s.initCtxConn(ctx)
-	if input.Id == "" {
-		input.Id = ulid.Make().String()
+	// validate input
+	if input.LogoBase64Str == nil && input.LogoPath == nil {
+		return "", ErrInvalidParams.WithMessage("either 'logo_base64_str' or 'logo_path' must be provided")
+	}
+	if strings.TrimSpace(input.SrcKey) == "" {
+		return "", ErrInvalidParams.WithMessage("'src_key' must be provided")
 	}
 
-	return input.Id, storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
+	ctx = log.CtxWithValues(ctx, "action", "SaveWorldLogo", "id", input.Id, "name", input.Name, "key", input.SrcKey)
+	ctx = s.initCtxConn(ctx)
+	if input.Id == nil {
+		input.Id = model.Ptr(ulid.Make().String())
+	}
+
+	return *input.Id, storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
 		if err = s.doUploadLogo(ctx, &input); err != nil {
 			return err
 		}
@@ -154,8 +162,8 @@ func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLo
 
 	timePfx := time.Now().UnixNano()
 	// ValuePropositionImage
-	if item.LogoData != nil {
-		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoData)))
+	if item.LogoBase64Str != nil {
+		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoBase64Str)))
 		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("/worldlogo/%s_%d", name, timePfx), source, "")
 		if err != nil {
 			return ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_data": err.Error()})

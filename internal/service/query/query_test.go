@@ -45,7 +45,7 @@ func Test_WorldLogo(t *testing.T) {
 
 	id := ulid.Make().String()
 	err := SaveWorldLogo(ctx, model.WorldLogoInput{
-		Id:       id,
+		Id:       &id,
 		Name:     "name 1",
 		LogoPath: ptr("logo url 1"),
 		SrcKey:   "key1",
@@ -67,7 +67,7 @@ func Test_WorldLogo(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		err = SaveWorldLogo(ctx, model.WorldLogoInput{
-			Id:       ulid.Make().String(),
+			Id:       model.Ptr(ulid.Make().String()),
 			Name:     fmt.Sprintf("name %d", i),
 			LogoPath: ptr(fmt.Sprintf("logo url %d", i)),
 			SrcKey:   fmt.Sprintf("key%d", i),

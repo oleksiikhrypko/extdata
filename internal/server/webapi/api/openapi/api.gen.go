@@ -46,12 +46,20 @@ type Error struct {
 
 // WorldLogo defines model for worldLogo.
 type WorldLogo struct {
-	CreatedAt   time.Time `json:"created_at"`
-	Description string    `json:"description"`
-	Id          string    `json:"id"`
-	LogoPath    string    `json:"logo_path"`
-	Name        string    `json:"name"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	Id        string    `json:"id"`
+	LogoPath  string    `json:"logo_path"`
+	Name      string    `json:"name"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// WorldLogoInput defines model for worldLogoInput.
+type WorldLogoInput struct {
+	Id            *string `json:"id,omitempty"`
+	LogoBase64Str *string `json:"logo_base64_str,omitempty"`
+	LogoPath      *string `json:"logo_path,omitempty"`
+	Name          string  `json:"name"`
+	SrcKey        string  `json:"src_key"`
 }
 
 // ApiKey defines model for api-key.
@@ -97,9 +105,6 @@ type GetWorldLogosParams struct {
 
 	// SortOrder The order to sort by
 	SortOrder *GetWorldLogosParamsSortOrder `form:"sort-order,omitempty" json:"sort-order,omitempty"`
-
-	// XAPIKEY API key to access the API
-	XAPIKEY ApiKey `json:"X-API-KEY"`
 }
 
 // GetWorldLogosParamsSortBy defines parameters for GetWorldLogos.
@@ -107,6 +112,15 @@ type GetWorldLogosParamsSortBy string
 
 // GetWorldLogosParamsSortOrder defines parameters for GetWorldLogos.
 type GetWorldLogosParamsSortOrder string
+
+// CreateWorldLogoParams defines parameters for CreateWorldLogo.
+type CreateWorldLogoParams struct {
+	// XAPIKEY API key to access the API
+	XAPIKEY ApiKey `json:"X-API-KEY"`
+}
+
+// CreateWorldLogoJSONRequestBody defines body for CreateWorldLogo for application/json ContentType.
+type CreateWorldLogoJSONRequestBody = WorldLogoInput
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -184,12 +198,41 @@ type ClientInterface interface {
 	// GetWorldLogos request
 	GetWorldLogos(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// CreateWorldLogoWithBody request with any body
+	CreateWorldLogoWithBody(ctx context.Context, params *CreateWorldLogoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateWorldLogo(ctx context.Context, params *CreateWorldLogoParams, body CreateWorldLogoJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetWorldLogoById request
 	GetWorldLogoById(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetWorldLogos(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetWorldLogosRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateWorldLogoWithBody(ctx context.Context, params *CreateWorldLogoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateWorldLogoRequestWithBody(c.Server, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateWorldLogo(ctx context.Context, params *CreateWorldLogoParams, body CreateWorldLogoJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateWorldLogoRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -350,6 +393,46 @@ func NewGetWorldLogosRequest(server string, params *GetWorldLogosParams) (*http.
 		return nil, err
 	}
 
+	return req, nil
+}
+
+// NewCreateWorldLogoRequest calls the generic CreateWorldLogo builder with application/json body
+func NewCreateWorldLogoRequest(server string, params *CreateWorldLogoParams, body CreateWorldLogoJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateWorldLogoRequestWithBody(server, params, "application/json", bodyReader)
+}
+
+// NewCreateWorldLogoRequestWithBody generates requests for CreateWorldLogo with any type of body
+func NewCreateWorldLogoRequestWithBody(server string, params *CreateWorldLogoParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/world-logo/")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
 	if params != nil {
 
 		var headerParam0 string
@@ -446,6 +529,11 @@ type ClientWithResponsesInterface interface {
 	// GetWorldLogosWithResponse request
 	GetWorldLogosWithResponse(ctx context.Context, params *GetWorldLogosParams, reqEditors ...RequestEditorFn) (*GetWorldLogosResponse, error)
 
+	// CreateWorldLogoWithBodyWithResponse request with any body
+	CreateWorldLogoWithBodyWithResponse(ctx context.Context, params *CreateWorldLogoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateWorldLogoResponse, error)
+
+	CreateWorldLogoWithResponse(ctx context.Context, params *CreateWorldLogoParams, body CreateWorldLogoJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateWorldLogoResponse, error)
+
 	// GetWorldLogoByIdWithResponse request
 	GetWorldLogoByIdWithResponse(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*GetWorldLogoByIdResponse, error)
 }
@@ -453,7 +541,7 @@ type ClientWithResponsesInterface interface {
 type GetWorldLogosResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *WorldLogo
+	JSON200      *[]WorldLogo
 	JSON500      *ErrorResponse
 }
 
@@ -467,6 +555,29 @@ func (r GetWorldLogosResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetWorldLogosResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateWorldLogoResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *WorldLogo
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateWorldLogoResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateWorldLogoResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -506,6 +617,23 @@ func (c *ClientWithResponses) GetWorldLogosWithResponse(ctx context.Context, par
 	return ParseGetWorldLogosResponse(rsp)
 }
 
+// CreateWorldLogoWithBodyWithResponse request with arbitrary body returning *CreateWorldLogoResponse
+func (c *ClientWithResponses) CreateWorldLogoWithBodyWithResponse(ctx context.Context, params *CreateWorldLogoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateWorldLogoResponse, error) {
+	rsp, err := c.CreateWorldLogoWithBody(ctx, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateWorldLogoResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateWorldLogoWithResponse(ctx context.Context, params *CreateWorldLogoParams, body CreateWorldLogoJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateWorldLogoResponse, error) {
+	rsp, err := c.CreateWorldLogo(ctx, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateWorldLogoResponse(rsp)
+}
+
 // GetWorldLogoByIdWithResponse request returning *GetWorldLogoByIdResponse
 func (c *ClientWithResponses) GetWorldLogoByIdWithResponse(ctx context.Context, id IdParam, reqEditors ...RequestEditorFn) (*GetWorldLogoByIdResponse, error) {
 	rsp, err := c.GetWorldLogoById(ctx, id, reqEditors...)
@@ -524,6 +652,39 @@ func ParseGetWorldLogosResponse(rsp *http.Response) (*GetWorldLogosResponse, err
 	}
 
 	response := &GetWorldLogosResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []WorldLogo
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateWorldLogoResponse parses an HTTP response from a CreateWorldLogoWithResponse call
+func ParseCreateWorldLogoResponse(rsp *http.Response) (*CreateWorldLogoResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateWorldLogoResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -590,9 +751,12 @@ func ParseGetWorldLogoByIdResponse(rsp *http.Response) (*GetWorldLogoByIdRespons
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Get world logo by id
+	// Get world logos
 	// (GET /world-logo/)
 	GetWorldLogos(ctx echo.Context, params GetWorldLogosParams) error
+	// Create world logo
+	// (POST /world-logo/)
+	CreateWorldLogo(ctx echo.Context, params CreateWorldLogoParams) error
 	// Get world logo by id
 	// (GET /world-logo/{id})
 	GetWorldLogoById(ctx echo.Context, id IdParam) error
@@ -660,6 +824,20 @@ func (w *ServerInterfaceWrapper) GetWorldLogos(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter sort-order: %s", err))
 	}
 
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetWorldLogos(ctx, params)
+	return err
+}
+
+// CreateWorldLogo converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateWorldLogo(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateWorldLogoParams
+
 	headers := ctx.Request().Header
 	// ------------- Required header parameter "X-API-KEY" -------------
 	if valueList, found := headers[http.CanonicalHeaderKey("X-API-KEY")]; found {
@@ -680,7 +858,7 @@ func (w *ServerInterfaceWrapper) GetWorldLogos(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetWorldLogos(ctx, params)
+	err = w.Handler.CreateWorldLogo(ctx, params)
 	return err
 }
 
@@ -731,6 +909,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/world-logo/", wrapper.GetWorldLogos)
+	router.POST(baseURL+"/world-logo/", wrapper.CreateWorldLogo)
 	router.GET(baseURL+"/world-logo/:id", wrapper.GetWorldLogoById)
 
 }
@@ -738,24 +917,27 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"H4sIAAAAAAAC/8RY3W7bOBN9FYLfB+wNbbltWhS6S5t24d1eBG2B7qI1UlocWWwkUhmOkgiB3n1BSrJl",
+	"W3YdbJG9s6TRzJm/cyg/8MQWpTVgyPH4gZcSZQEEGK5kqSfXUPufClyCuiRtDY/5+eWcXUPNyDKZJOAc",
+	"owzY+eWcC669QQZSAXLBjSyAx/yvyfnlfPLnu7+54Ag3lUZQPCasQHCXZFBIH4Tq0hs7Qm1WvGkE1+rS",
+	"I9pH8DkDphVb4532kUtJ2SauVo8MmOtC03g4UxVLQGZTpgkK55NHoApNH/qmAqw3sVtXx8IrSGWVE4+f",
+	"vxQ8tVhI4jGvtKFXZ1zwQt7roip4/Gw2E7zQprsSPW5tCFaAAbhNUwenI3fXumRLSC0CcySRtFn5+4nN",
+	"c0go9BPBVTkxByRYJh3LfaNL1BY11YwyaVgbNQzJeBE6WMOs9xM9mM749PmUuumrHLDUYoejTWIEeeHT",
+	"HEN+FHWX1uFxaXxzXWmNg7AvgGjxY3fH30isITDU7lKZ60T6FKIfzufxMPD8f4SUx/x/0WYdo/api4LX",
+	"Ntp2HeaGAI3MmQO8BWSdoeDG0ntbGfV0UHxLXAmJTjUoX35bYQLsTjpmLLHUowl97TytqxVIB20JSLot",
+	"YqohV25Qbrv8AQn5vApwTq5gfHM3a/Z1bSh6bwux7+3OYq4+2JXdx5AgSAJ1JWlrYJUkmJAuYDOzPQBP",
+	"VSO4BM/tyl4FUhp72s7byIOqVI9EsFOCwHzB/RCDGKa2FeVoheamrGi/TMdSXkoHr86uHOGvLIvD5Krj",
+	"hOPp94adr/3svDNIKk8In/xMthm9AYmA51WLaxmu3vfF/+PLZ747+O/8DgbOIXsNht1pysLl99YVY99Z",
+	"iZDqe8Fgupqyb10MJpeJgmfPX5y9/ManPc14hG3UTYMzorLdOW3SMKykKfdP5goku7CF1MaLb+ABnfiO",
+	"3wK6FuBsOpvOfOlsCUaWmsf8RbglglSGrKPQ6InvSeSvV2NC8jFonWOS5dqRF5PwFvNvOR78Y+CUueIx",
+	"/x3oSz89LsTaHCy+jpPMxiRqpbMRPzXsWPxky0Dp3nqEvkBikrFeCcZkoTU5KgmjrucXvzlfMD8X20Ub",
+	"i6KV2woRNHt0G7obElHWh2IHAgyKb5HY8mBqFmmy3JY7MP64MaSShTgtYYvKb8VJQYPtaNzzT2+54Bfv",
+	"Pr0dC7zYEd/ns9mjdG5d1mOCt9GI/XLvieDxDWkEf9lCHAu4TiXaPkQMeSpszpChvi58FVxVFBLrdul2",
+	"5ovkyi8c3yw4XzSCl9aNbPjbIA1MMgN3Az8MIbGoBNNpOHbJHEGqmsG9duQE08TudJ6zJbBOT/bYoPW8",
+	"JoRH80H/IdI2/aYCR2+sqn/ZuWZH6JptNfHH9uZfTtuJQ3Z4qDrdHvTlKSaqG4lB0AMz1YgtFXnQqjlB",
+	"SZw2qxz2Z+2onLyp5+1X3X/ZjiPYG8HPZmc/b8veKf3JGYItaxbI/RBNPGpJ+2/1ZtFC8t8k7YvbJfxg",
+	"k/U3iz+DYt4dcuIoyv2zzDqKX89ez/zeRyNyfQG3Y++7OIq0Ajlxt8lUwe3U5bVZuczSVNvO12Kd7K7T",
+	"MF/M9737I6MTqUFNmkXzTwAAAP//ruj2bjERAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
