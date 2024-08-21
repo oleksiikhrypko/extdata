@@ -21,7 +21,7 @@ func bindError(c echo.Context, err error) error {
 	return c.JSON(http.StatusBadRequest, msg)
 }
 
-func handleError(c echo.Context, err error) error {
+func handleError(_ echo.Context, err error) error {
 	msg := api.Error{
 		Message: err.Error(),
 	}

@@ -102,6 +102,9 @@ func (s *WorldLogoService) DeleteWorldLogo(ctx context.Context, apiKey string, i
 
 	return storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
 		recs, err := sq.GetWorldLogos(ctx, model.WorldLogosQueryOptions{Ids: ids}, nil, psql.Pagination{Limit: uint64(len(ids))})
+		if err != nil {
+			return fromStorageErr(err)
+		}
 		if err = sq.DeleteWorldLogo(ctx, ids...); err != nil {
 			return fromStorageErr(err)
 		}
@@ -143,7 +146,6 @@ func (s *WorldLogoService) GetWorldLogosCount(ctx context.Context, ops model.Wor
 	ctx = s.initCtxConn(ctx)
 	count, err = sq.GetWorldLogosCount(ctx, ops)
 	return count, fromStorageErr(err)
-
 }
 
 func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLogoInput) error {

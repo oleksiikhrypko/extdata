@@ -24,7 +24,6 @@ func (h Handler) GetWorldLogoById(c echo.Context, id api.IdParam) error {
 	}
 
 	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(data))
-
 }
 
 func (h Handler) GetWorldLogos(c echo.Context, params api.GetWorldLogosParams) error {
