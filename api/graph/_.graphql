@@ -1,0 +1,19 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Any
+scalar Time
+scalar Map
+scalar UInt64
+
+input Pagination {
+  limit: UInt64!
+  offset: UInt64
+  offset_key: ID
+}
+
+enum Direction {
+  ASC
+  DESC
+}

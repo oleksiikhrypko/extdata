@@ -1,0 +1,118 @@
+{{- range $k, $v := .Values.services }}
+{{- if $v.enabled -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Chart.Name }}-{{ $k }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $k }}
+    {{- with $v.labels }}
+      {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  {{- if not $v.hpa }}
+  replicas: {{ $v.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}-{{ $k }}
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}-{{ $k }}
+        version: v1
+      {{- with $v.podLabels }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      annotations:
+      {{- with $v.podAnnotations }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if $v.serviceAccount }}
+      serviceAccountName: {{ $v.serviceAccount.name }}
+      {{- end }}
+      {{- if $v.migration }}
+      initContainers:
+        - name: migrate
+          image: "{{ $.Values.global.image.repository }}:{{ $.Values.global.image.tag | default $.Chart.Version }}"
+          command:
+            - /app
+            - --config-file=/configs/config.yaml
+            - migrate
+            - up
+          envFrom:
+            - secretRef:
+                name: {{ $.Chart.Name}}
+          volumeMounts:
+            - name: config-vol
+              mountPath: /configs
+      {{- end }}
+      containers:
+        - name: {{ $.Chart.Name }}-{{ $k }}
+          image: "{{ $.Values.global.image.repository }}:{{ $.Values.global.image.tag | default $.Chart.Version }}"
+          imagePullPolicy: {{ $.Values.global.image.pullPolicy }}
+          {{- if $v.commandOverride }}
+          command:
+          {{- with $v.commandOverride.commandArgs }}
+            {{- toYaml $v.commandOverride.commandArgs | nindent 12 }}
+          {{- end }}
+          {{- else }}
+          command:
+            - /app
+            - --config-file=/configs/config.yaml
+            - start
+            - {{ $k }}
+          {{- end }}
+          env:
+{{- toYaml $.Values.global.envs | nindent 12 }}
+          {{- with $v.extraEnvs }}
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: common-env
+            - secretRef:
+                name: {{ $.Chart.Name}}
+          resources:
+{{- toYaml $v.resources | nindent 12 }}
+{{- if $v.livenessProbe }}
+          livenessProbe:
+{{- toYaml $v.livenessProbe | nindent 12 }}
+{{- end }}
+{{- if $v.startupProbe }}
+          startupProbe:
+{{- toYaml $v.startupProbe | nindent 12 }}
+{{- end }}
+{{- if $v.ports }}
+          ports:
+{{- toYaml $v.ports | nindent 12 }}
+{{- end }}
+          volumeMounts:
+            - name: config-vol
+              mountPath: /configs
+              readOnly: true
+            - name: aws-ca-vol
+              mountPath: /etc/ssl/certs
+              readOnly: true
+            {{- with $v.volumeMount }}
+              {{- toYaml . | trim | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config-vol
+          configMap:
+            name: {{ $.Chart.Name}}-{{ $k }}-config
+        - name: aws-ca-vol
+          configMap:
+            name: aws-ca
+            optional: true
+        {{- with $v.volume }}
+          {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+{{- end }}
+{{ end }}

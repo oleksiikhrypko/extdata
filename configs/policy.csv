@@ -1,0 +1,10 @@
+p, *, /meta/{.},
+p, *, /health,
+p, *, /graph,
+p, *, /graph/query, Connection:Upgrade;Upgrade:websocket
+p, *, /graph/query, Connection:upgrade;Upgrade:websocket
+p, *, /api/worldlogo/index,
+
+p, idea:read, /api/worldlogo/search,
+p, idea:query, /graph/query,
+

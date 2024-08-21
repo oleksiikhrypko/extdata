@@ -1,0 +1,25 @@
+name: Deploy qa uat prod with help button
+
+on:
+  workflow_dispatch:
+    inputs:
+      kind_env:
+        description: 'Please choose env qa|uat|prod'
+        required: true
+        type: choice
+        options:
+          - qa
+          - uat
+          - prod
+      tag_name:
+        description: 'Put tag name for deploy'
+        required: true
+        type: string
+
+jobs:
+  create-tag:
+    uses: Slyngshot-Team/github-shared-actions/.github/workflows/release-qa-uat-prod-with-help-button.yaml@main
+    secrets: inherit
+    with:
+      tag_name: ${{ inputs.tag_name }}
+      kind_env: ${{ inputs.kind_env }}

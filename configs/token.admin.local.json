@@ -1,0 +1,15 @@
+{
+  "aud":[
+    "https://ext-data-domain.dev.slyngshot.ai/"
+  ],
+  "azp":"FL2O6JMKvCmBJtHS2uOw7YHL4szg4Qhy",
+  "exp":2687982827,
+  "iat":1687875627,
+  "iss": "https://authorization-proxy.dev.slyngshot.ai/",
+  "urn:zitadel:iam:org:project:roles":[
+    "idea:query"
+  ],
+  "scope":"openid profile email",
+  "sub":"auth0|64899972a5c6f11156dc3a6d",
+  "x-user-id":"02GGGG541XTV2KYNA2111SADM1"
+}

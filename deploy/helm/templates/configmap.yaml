@@ -1,0 +1,20 @@
+{{- if .Values.configs }}
+{{- range $k, $v := .Values.configs }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Chart.Name }}-{{ $k }}-config
+  namespace: {{ $.Release.Namespace }}
+data:
+  config.yaml: |
+  {{- if $v.use_shared_config }}
+    {{- with $.Values.shared_config }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+    {{- with $v.data }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{ end }}
+{{ end }}

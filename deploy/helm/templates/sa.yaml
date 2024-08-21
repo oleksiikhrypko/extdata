@@ -1,0 +1,14 @@
+{{- range $k, $v := .Values.services }}
+{{- if $v.serviceAccount -}}
+{{- if $v.serviceAccount.create -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $v.serviceAccount.name }}
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    eks.amazonaws.com/role-arn: {{ $v.serviceAccount.role_arn }}
+{{- end }}
+{{- end }}
+{{ end }}

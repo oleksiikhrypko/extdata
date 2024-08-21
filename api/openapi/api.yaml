@@ -1,0 +1,94 @@
+openapi: 3.0.0
+info:
+  version: 0.0.0
+  title: Idea Domain API service
+servers:
+  - url: http://localhost:8080/api/
+    description: Local server
+  - url: https://idea-svc.dev.slyngshot.io/api/
+    description: Dev server
+paths:
+#idea
+  /world-logo/{id}:
+    parameters:
+      - $ref: '#/components/parameters/idParam'
+    get:
+      tags:
+      - world-logo
+      operationId: GetWorldLogoById
+      summary: Get world logo by id
+      description: Returns a single world logo record
+      security:
+      - BearerAuth: []
+      responses:
+        200:
+          $ref: '#/components/responses/htmlResponse'
+        404:
+          $ref: '#/components/responses/notFoundResponse'
+        500:
+          $ref: '#/components/responses/errorResponse'
+
+tags:
+  - name: world-logo
+    description: 'World Logo API'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Enter the token with the `Bearer  ` prefix, e.g. \"Bearer abcde12345\"."
+
+  schemas:
+    error:
+      type: object
+      required:
+        - message
+        - fields
+      properties:
+        message:
+          type: string
+        fields:
+          type: object
+
+  parameters:
+    idParam:
+      in: path
+      name: id
+      description: The id parameter.
+      required: true
+      schema:
+        type: string
+
+  responses:
+    htmlResponse:
+      description: OK
+      content:
+        text/html:
+          schema:
+            type: string
+    notFoundResponse:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    invalidInputResponse:
+      description: The input is not valid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    forbiddenResponse:
+      description: Operation is not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    errorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'

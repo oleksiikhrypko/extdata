@@ -1,0 +1,3 @@
+psql:
+  database_url: '{{.database_dsn}}'
+  max_connections: 1

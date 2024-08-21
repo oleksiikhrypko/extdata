@@ -1,0 +1,50 @@
+webapi:
+  port: 8080
+  host: ""
+  cors-allowed-origins:
+    - "*"
+  cors-allowed-headers:
+    - authorization
+    - content-type
+    - keep-alive
+    - user-agent
+    - cache-control
+    - content-type
+    - content-transfer-encoding
+    - accept-encoding
+    - accept-language
+    - connection
+    - host
+    - origin
+    - pragma
+    - sec-websocket-extensions
+    - sec-websocket-key
+    - sec-websocket-protocol
+    - sec-websocket-version
+    - upgrade
+
+log:
+  format: json
+  log-level: debug
+
+psql:
+  database_url: "postgres://postgres:mysecretpassword@localhost:5432/ext-data-domain?sslmode=disable"
+  max_open_connections: 10
+
+casbin:
+  model-file: ./configs/rbac.conf
+  policy-file: ./configs/policy.csv
+
+authn:
+  jwks-url: "https://auth.dev.slyngshot.io/oauth/v2/keys"
+  auth-header: Authorization
+  auth-prefixes:
+    - "Bearer "
+
+aws-s3-storage:
+  region: "us-east-2"
+  bucket: "ext-data-domain-static.dev.slyngshot.io"
+  baseUrl: "https://ext-data-domain-static.dev.slyngshot.io/"
+
+world-logo-service:
+  apikey: "myapikey"

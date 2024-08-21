@@ -1,0 +1,34 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type WorldLogo {
+  id: ID!
+  name: String!
+  logo_path: String!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type PaginatedWorldLogos {
+  items: [WorldLogo!]!
+  total: UInt64!
+}
+
+input SpaceFilterOptions {
+  ids: [ID!]
+}
+
+input OrderWorldLogoOps {
+  field: OrderWorldLogosFields!
+  direction: Direction!
+}
+
+enum OrderWorldLogosFields {
+  id
+  name
+}
+
+extend type Query {
+  world_logos(filter_options:SpaceFilterOptions, search: String, order_ops: [OrderWorldLogoOps!], pagination: Pagination): PaginatedWorldLogos!
+}

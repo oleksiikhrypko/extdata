@@ -1,0 +1,122 @@
+global:
+  image:
+    repository: 837223769016.dkr.ecr.us-east-2.amazonaws.com/slyngshot-team/ext-data-domain
+    pullPolicy: IfNotPresent
+
+  envs:
+    - name: DD_AGENT_HOST
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.hostIP
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+
+shared_config:
+  log:
+    format: json
+    log-level: debug
+
+  casbin:
+    model-file: /rbac.conf
+    policy-file: /policy.csv
+
+  authn:
+    jwks-url: "https://auth-test.dev.slyngshot.io/oauth/v2/keys"
+    auth-header: Authorization
+    auth-prefixes:
+      - "Bearer "
+
+  webapi:
+    port: 8080
+    host: ""
+    cors-allowed-origins:
+      - "*"
+    cors-allowed-headers:
+      - authorization
+      - content-type
+      - keep-alive
+      - user-agent
+      - cache-control
+      - content-type
+      - content-transfer-encoding
+      - accept-encoding
+      - accept-language
+      - connection
+      - host
+      - origin
+      - pragma
+      - sec-websocket-extensions
+      - sec-websocket-key
+      - sec-websocket-protocol
+      - sec-websocket-version
+      - upgrade
+
+  psql:
+    database_url: '{{ .psql_database_url | escape }}'
+    max_open_connections: 20
+
+  aws-s3-storage:
+    region: "us-east-2"
+    bucket: "ext-data-domain-static.dev.slyngshot.io"
+    baseUrl: "https://ext-data-domain-static.dev.slyngshot.io/"
+
+configs:
+  webapi:
+    use_shared_config: true
+    data:
+      world-logo-service:
+        apikey: '{{ .world_logo_api_key }}'
+
+services:
+  webapi:
+    migration: true
+    enabled: true
+    serviceAccount:
+      name: ext-data-domain-sa
+      role_arn: arn:aws:iam::837223769016:role/ext-data-domain-role
+      create: true
+    podAnnotations: { }
+    podLabels:
+      sidecar.istio.io/inject: "true"
+    hpa:
+      cpu_threshold: 70
+      memory_threshold: 800Mi
+      minReplicas: 1
+      maxReplicas: 10
+    services:
+      public:
+        port: 8080
+    ports:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+    replicas: 1
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "1024Mi"
+        cpu: "600m"
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 1
+      periodSeconds: 30
+    startupProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 30
+    volume:
+    volumeMount:

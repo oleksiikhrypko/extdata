@@ -1,0 +1,23 @@
+{{- range $k, $v := .Values.services }}
+{{- if $v.services -}}
+{{- range $skey, $svalue := $v.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Chart.Name }}-{{ $k }}-{{ $skey }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $k }}
+spec:
+  type: {{ $svalue.type | default "ClusterIP" | quote }}
+  ports:
+    - port: {{ $svalue.port }}
+      targetPort: {{ $svalue.targetPort | default $svalue.port }}
+      protocol: TCP
+      name: {{ $svalue.port_name | default "http" | quote }}
+  selector:
+    app: {{ $.Chart.Name }}-{{ $k }}
+{{- end }}
+{{- end }}
+{{ end }}

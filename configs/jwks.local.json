@@ -1,0 +1,10 @@
+{
+  "keys":[
+    {
+      "kty": "oct",
+      "use": "sig",
+      "kid": "IntegrationTests",
+      "k": "VGVzdFNlY3JldA"
+    }
+  ]
+}

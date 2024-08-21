@@ -1,0 +1,12 @@
+name: Run tests and release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    uses: Slyngshot-Team/github-shared-actions/.github/workflows/helm-release-to-main.yaml@main
+    secrets: inherit
+    with:
+      go_version: 1.21.5

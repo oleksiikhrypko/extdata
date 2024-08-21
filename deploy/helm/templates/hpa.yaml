@@ -1,0 +1,32 @@
+{{- range $k, $v := .Values.services }}
+{{- if $v.hpa -}}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $.Chart.Name }}-{{ $k }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $k }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $.Chart.Name }}-{{ $k }}
+  minReplicas: {{ $v.hpa.minReplicas }}
+  maxReplicas: {{ $v.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $v.hpa.cpu_threshold }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: AverageValue
+          averageValue: {{ $v.hpa.memory_threshold }}
+{{- end }}
+{{ end }}

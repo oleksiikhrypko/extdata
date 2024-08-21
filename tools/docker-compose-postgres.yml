@@ -1,0 +1,12 @@
+---
+version: '3'
+services:
+  db:
+    image: postgres
+    container_name: ext-data-domain-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: ext-data-domain
+    ports:
+      - "5432:5432"

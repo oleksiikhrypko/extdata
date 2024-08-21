@@ -1,0 +1,11 @@
+apiVersion: v1
+version: 0.0.1
+appVersion: 0.0.1
+name: ext-data-domain
+description: ext-data-domain service helm chart for Kubernetes
+home: https://github.com/slyngshot-team/ext-data-domain
+maintainers:
+- email: andreyareshchenko@singletonfoundation.org
+  name: devops
+sources:
+- https://github.com/slyngshot-team/ext-data-domain
