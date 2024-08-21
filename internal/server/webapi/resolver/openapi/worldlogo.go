@@ -92,3 +92,17 @@ func (h Handler) CreateWorldLogo(c echo.Context, params api.CreateWorldLogoParam
 
 	return c.JSON(http.StatusOK, model.ToAPIWorldLogo(rec))
 }
+
+func (h Handler) DeleteWorldLogoById(c echo.Context, id api.IdParam, params api.DeleteWorldLogoByIdParams) error {
+	ctx := c.Request().Context()
+	if userId, err := auth.GetUserID(ctx); err != nil {
+		ctx = log.CtxWithValues(ctx, "user_id", userId)
+	}
+
+	err := h.worldlogoService.DeleteWorldLogo(ctx, params.XAPIKEY, id)
+	if err != nil {
+		return handleError(c, err)
+	}
+
+	return c.NoContent(http.StatusOK)
+}

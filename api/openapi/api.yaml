@@ -5,10 +5,10 @@ info:
 servers:
   - url: http://localhost:8080/api/
     description: Local server
-  - url: https://idea-svc.dev.slyngshot.io/api/
+  - url: https://ext-data-domain-svc.dev.slyngshot.io/api/
     description: Dev server
 paths:
-#idea
+#world-logo
   /world-logo/:
     get:
       tags:
@@ -112,6 +112,22 @@ paths:
 
         404:
           $ref: '#/components/responses/notFoundResponse'
+        500:
+          $ref: '#/components/responses/errorResponse'
+
+    delete:
+      tags:
+      - world-logo
+      operationId: DeleteWorldLogoById
+      parameters:
+        - $ref: '#/components/parameters/api-key'
+      summary: Delete world logo by id
+      description: Deletes a single world logo record
+      security:
+      - BearerAuth: []
+      responses:
+        200:
+          $ref: '#/components/responses/okResponse'
         500:
           $ref: '#/components/responses/errorResponse'
 
@@ -223,6 +239,8 @@ components:
         text/html:
           schema:
             type: string
+    okResponse:
+      description: OK
     notFoundResponse:
       description: The specified resource was not found
       content:
