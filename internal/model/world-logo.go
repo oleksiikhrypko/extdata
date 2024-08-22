@@ -12,11 +12,16 @@ type WorldLogo struct {
 }
 
 type WorldLogoInput struct {
-	Id            *string
-	Name          string
-	LogoPath      *string
-	LogoBase64Str *string
+	Id       string
+	SrcKey   string
+	Name     string
+	LogoPath string
+}
+
+type SaveWorldLogoInput struct {
 	SrcKey        string
+	Name          string
+	LogoBase64Str string
 }
 
 type WorldLogosQueryOptions struct {

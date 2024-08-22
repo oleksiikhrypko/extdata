@@ -45,9 +45,9 @@ func Test_WorldLogo(t *testing.T) {
 
 	id := ulid.Make().String()
 	err := SaveWorldLogo(ctx, model.WorldLogoInput{
-		Id:       &id,
+		Id:       id,
 		Name:     "name 1",
-		LogoPath: ptr("logo url 1"),
+		LogoPath: "logo url 1",
 		SrcKey:   "key1",
 	})
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func Test_WorldLogo(t *testing.T) {
 	require.Equal(t, "logo url 1", rec.LogoPath)
 	require.Equal(t, "key1", rec.SrcKey)
 
-	rec, err = GetWorldLogoBySrcKey(ctx, "key1")
+	rec, err = LockWorldLogoBySrcKey(ctx, "key1")
 	require.NoError(t, err)
 	require.Equal(t, id, rec.Id)
 	require.Equal(t, "name 1", rec.Name)
@@ -74,9 +74,9 @@ func Test_WorldLogo(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		err = SaveWorldLogo(ctx, model.WorldLogoInput{
-			Id:       model.Ptr(ulid.Make().String()),
+			Id:       ulid.Make().String(),
 			Name:     fmt.Sprintf("name %d", i),
-			LogoPath: ptr(fmt.Sprintf("logo url %d", i)),
+			LogoPath: fmt.Sprintf("logo url %d", i),
 			SrcKey:   fmt.Sprintf("key%d", i),
 		})
 		require.NoError(t, err)

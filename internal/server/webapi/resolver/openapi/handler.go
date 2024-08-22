@@ -27,7 +27,7 @@ type Handler struct {
 type WorldlogoService interface {
 	GetWorldLogoById(ctx context.Context, id string) (res model.WorldLogo, err error)
 	GetWorldLogos(ctx context.Context, ops model.WorldLogosQueryOptions, sort []psql.Sort, pg psql.Pagination) (res []model.WorldLogo, err error)
-	SaveWorldLogo(ctx context.Context, apiKey string, input model.WorldLogoInput) (id string, err error)
+	SaveWorldLogo(ctx context.Context, apiKey string, input model.SaveWorldLogoInput) (id string, err error)
 	DeleteWorldLogo(ctx context.Context, apiKey string, ids ...string) (err error)
 }
 

@@ -74,10 +74,8 @@ func (h Handler) CreateWorldLogo(c echo.Context, params api.CreateWorldLogoParam
 		return bindError(c, err)
 	}
 
-	id, err := h.worldlogoService.SaveWorldLogo(ctx, params.XAPIKEY, model.WorldLogoInput{
-		Id:            input.Id,
+	id, err := h.worldlogoService.SaveWorldLogo(ctx, params.XAPIKEY, model.SaveWorldLogoInput{
 		Name:          input.Name,
-		LogoPath:      input.LogoPath,
 		LogoBase64Str: input.LogoBase64Str,
 		SrcKey:        input.SrcKey,
 	})

@@ -180,14 +180,11 @@ components:
       required:
         - src_key
         - name
+        - logo_base64_str
       properties:
-        id:
-          type: string
         src_key:
           type: string
         name:
-          type: string
-        logo_path:
           type: string
         logo_base64_str:
           type: string

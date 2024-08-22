@@ -59,7 +59,7 @@ func (s *WorldLogoService) GetWorldLogoById(ctx context.Context, id string) (res
 	return res, fromStorageErr(err)
 }
 
-func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, input model.WorldLogoInput) (id string, err error) {
+func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, input model.SaveWorldLogoInput) (id string, err error) {
 	mtxFn := CollectMetricFn("SaveWorldLogo")
 	defer func() {
 		mtxFn(ctx, err)
@@ -70,40 +70,51 @@ func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, inp
 	}
 
 	// validate input
-	if input.LogoBase64Str == nil && input.LogoPath == nil {
-		return "", ErrInvalidParams.WithMessage("either 'logo_base64_str' or 'logo_path' must be provided")
-	}
 	if strings.TrimSpace(input.SrcKey) == "" {
 		return "", ErrInvalidParams.WithMessage("'src_key' must be provided")
 	}
-
-	ctx = log.CtxWithValues(ctx, "action", "SaveWorldLogo", "id", input.Id, "name", input.Name, "key", input.SrcKey)
-	ctx = s.initCtxConn(ctx)
-	if input.Id == nil {
-		input.Id = model.Ptr(ulid.Make().String())
+	if strings.TrimSpace(input.Name) == "" {
+		return "", ErrInvalidParams.WithMessage("'name' must be provided")
+	}
+	if len(input.LogoBase64Str) == 0 {
+		return "", ErrInvalidParams.WithMessage("either 'logo_base64_str' must be provided")
 	}
 
-	return *input.Id, storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
+	ctx = log.CtxWithValues(ctx, "action", "SaveWorldLogo", "name", input.Name, "key", input.SrcKey)
+	ctx = s.initCtxConn(ctx)
+
+	rec := model.WorldLogoInput{
+		Id:     ulid.Make().String(),
+		Name:   input.Name,
+		SrcKey: input.SrcKey,
+	}
+
+	err = storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
 		// overwrite id if src_key exists
-		rec, err := sq.GetWorldLogoBySrcKey(ctx, input.SrcKey)
+		cRec, err := sq.LockWorldLogoBySrcKey(ctx, input.SrcKey)
 		if err != nil {
 			if !isStorageNotFoundErr(err) {
 				return fromStorageErr(err)
 			}
 		}
-		if rec.Id != "" {
-			input.Id = &rec.Id
-		}
-		// upload logo file if exists, and update the path. name of the file is the worldlogo/{id}.svg
-		if err = s.doUploadLogo(ctx, &input); err != nil {
-			return err
+		if cRec.Id != "" {
+			rec.Id = cRec.Id
 		}
 
-		if err = sq.SaveWorldLogo(ctx, input); err != nil {
+		// upload logo file
+		path, err := s.doUploadLogo(ctx, rec.Id, []byte(input.LogoBase64Str))
+		if err != nil {
+			return err
+		}
+		rec.LogoPath = path
+
+		// save record
+		if err = sq.SaveWorldLogo(ctx, rec); err != nil {
 			return fromStorageErr(err)
 		}
 		return nil
 	})
+	return rec.Id, err
 }
 
 func (s *WorldLogoService) DeleteWorldLogo(ctx context.Context, apiKey string, ids ...string) (err error) {
@@ -166,15 +177,12 @@ func (s *WorldLogoService) GetWorldLogosCount(ctx context.Context, ops model.Wor
 	return count, fromStorageErr(err)
 }
 
-func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLogoInput) error {
-	if item.LogoBase64Str != nil {
-		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoBase64Str)))
-		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s.svg", *item.Id), source, "image/svg+xml")
-		if err != nil {
-			return ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_data": err.Error()})
-		}
-		item.LogoPath = &propImage
+func (s *WorldLogoService) doUploadLogo(ctx context.Context, name string, data []byte) (path string, err error) {
+	source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(data))
+	propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s", name), source, "")
+	if err != nil {
+		return "", ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_base64_str": err.Error()})
 	}
 
-	return nil
+	return propImage, nil
 }

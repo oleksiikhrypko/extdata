@@ -18,7 +18,7 @@ func GetWorldLogoById(ctx context.Context, id string) (model.WorldLogo, error) {
 		return model.WorldLogo{}, err
 	}
 
-	q := `select * from world_logo where id=?`
+	q := `select * from world_logo where id=? limit 1`
 
 	var rec model.WorldLogo
 	if err = conn.QueryRowxContext(ctx, sqlx.Rebind(sqlx.DOLLAR, q), id).StructScan(&rec); err != nil {
@@ -28,13 +28,13 @@ func GetWorldLogoById(ctx context.Context, id string) (model.WorldLogo, error) {
 	return rec, nil
 }
 
-func GetWorldLogoBySrcKey(ctx context.Context, srcKey string) (model.WorldLogo, error) {
+func LockWorldLogoBySrcKey(ctx context.Context, srcKey string) (model.WorldLogo, error) {
 	conn, err := storage.CtxConn(ctx)
 	if err != nil {
 		return model.WorldLogo{}, err
 	}
 
-	q := `select * from world_logo where src_key=?`
+	q := `select * from world_logo where src_key=? for update limit 1`
 
 	var rec model.WorldLogo
 	if err = conn.QueryRowxContext(ctx, sqlx.Rebind(sqlx.DOLLAR, q), srcKey).StructScan(&rec); err != nil {
