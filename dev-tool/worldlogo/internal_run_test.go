@@ -20,12 +20,14 @@ func Test_getData(t *testing.T) {
 	for _, l := range alphabet {
 		hasMore := true
 		for i := 1; hasMore; i++ {
-			res, err := TakeWorldLogo(ctx, fmt.Sprintf("https://worldvectorlogo.com/alphabetical/%s/%d", l, i))
+			requrl := fmt.Sprintf("https://worldvectorlogo.com/alphabetical/%s/%d", l, i)
+			fmt.Printf("requrl: %s\n", requrl)
+			res, err := TakeWorldLogo(ctx, requrl)
 			require.NoError(t, err)
 			hasMore = len(res) != 0
 			err = WriteToSCV("./data/worldlogo.csv", res)
 			require.NoError(t, err)
-			<-time.After(2 * time.Second)
+			<-time.After(10 * time.Second)
 		}
 	}
 }
