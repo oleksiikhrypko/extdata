@@ -37,7 +37,8 @@ func Test_SendData(t *testing.T) {
 		t.Skip()
 	}
 
-	apikey := os.Getenv("WORLD_LOGO_API_KEY")
+	apikey := os.Getenv("WORLD_LOGO_API_KEY_dev")
+	// apikey := os.Getenv("WORLD_LOGO_API_KEY_prod")
 
 	// err := WriteDataFromCSVToAPI("./data/worldlogo.csv", "http://localhost:8080")
 	err := WriteDataFromCSVToAPI("./data/worldlogo_dev.csv", "https://ext-data-domain.dev.slyngshot.io", apikey)

@@ -19,10 +19,12 @@ func WriteDataFromCSVToAPI(filename, apiAddr, apikey string) error {
 	if err != nil {
 		return err
 	}
+	idx := 0
 	reader := csv.NewReader(file)
 	// Name Key Src
 	var record []string
 	for {
+		idx++
 		record, err = reader.Read()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
@@ -30,7 +32,7 @@ func WriteDataFromCSVToAPI(filename, apiAddr, apikey string) error {
 			}
 			return err
 		}
-		fmt.Println(record)
+		fmt.Println(idx, record)
 		// download image
 		img, err := downloadImage(record[2])
 		if err != nil {
