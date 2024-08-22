@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://localhost:8080/api/
     description: Local server
-  - url: https://ext-data-domain-svc.dev.slyngshot.io/api/
+  - url: https://ext-data-domain.dev.slyngshot.io/api/
     description: Dev server
 paths:
 #world-logo
@@ -128,8 +128,6 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/okResponse'
-        404:
-          $ref: '#/components/responses/notFoundResponse'
         500:
           $ref: '#/components/responses/errorResponse'
 
