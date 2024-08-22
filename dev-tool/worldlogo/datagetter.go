@@ -37,6 +37,10 @@ func loadHtmlPage(ctx context.Context, url string) (*html.Node, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("response code err: %d", resp.StatusCode)
 	}

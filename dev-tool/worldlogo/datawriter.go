@@ -14,7 +14,7 @@ import (
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 )
 
-func WriteDataFromCSVToAPI(filename, apiAddr string) error {
+func WriteDataFromCSVToAPI(filename, apiAddr, apikey string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -33,13 +33,15 @@ func WriteDataFromCSVToAPI(filename, apiAddr string) error {
 		// download image
 		img, err := downloadImage(record[2])
 		if err != nil {
-			return fmt.Errorf("downloadImage: %w", err)
+			fmt.Printf("failed url %s: %s", record[2], err)
+			continue
 		}
+
 		imgStr := base64.StdEncoding.EncodeToString(img)
 		// send to api
-		err = sendToAPI(apiAddr, record[0], record[1], imgStr)
+		err = sendToAPI(apiAddr, apikey, record[0], record[1], imgStr)
 		if err != nil {
-			return fmt.Errorf("sendToAPI: %w", err)
+			return fmt.Errorf("failed key %s: %s", record[1], err)
 		}
 	}
 }
@@ -57,7 +59,7 @@ func downloadImage(src string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func sendToAPI(apiAddr, name, key, img string) error {
+func sendToAPI(apiAddr, apikey, name, key, img string) error {
 	rec := api.WorldLogoInput{
 		Name:          name,
 		SrcKey:        key,
@@ -73,7 +75,7 @@ func sendToAPI(apiAddr, name, key, img string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-KEY", "myapikey")
+	req.Header.Set("X-API-KEY", apikey)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err

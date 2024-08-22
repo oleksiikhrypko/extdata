@@ -157,14 +157,14 @@ func (s *WorldLogoService) GetWorldLogosCount(ctx context.Context, ops model.Wor
 }
 
 func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLogoInput) error {
-	repl := strings.NewReplacer(" ", "_", "*", "_", "\\", "_", "-", "_", "/", "_")
+	repl := strings.NewReplacer(" ", "_", "*", "_", "\\", "_", "-", "_", "/", "_", "'", "_", "\"", "_", "+", "_", "(", "_", ")", "_", "[", "_", "]", "_", "{", "_", "}", "_", "<", "_", ">", "_", "=", "_", "!", "_", "@", "_", "#", "_", "$", "_", "%", "_", "^", "_", "&", "_", "*", "_", ":", "_", ";", "_", ",", "_", ".", "_", "?", "_", "|", "_", "~", "_", "`", "_")
 	name := repl.Replace(item.Name)
 
 	timePfx := time.Now().UnixNano()
 	// ValuePropositionImage
 	if item.LogoBase64Str != nil {
 		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoBase64Str)))
-		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("/worldlogo/%s_%d", name, timePfx), source, "")
+		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("/worldlogo/%s_%d.svg", name, timePfx), source, "image/svg+xml")
 		if err != nil {
 			return ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_data": err.Error()})
 		}
