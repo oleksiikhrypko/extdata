@@ -59,6 +59,13 @@ func Test_WorldLogo(t *testing.T) {
 	require.Equal(t, "logo url 1", rec.LogoPath)
 	require.Equal(t, "key1", rec.SrcKey)
 
+	rec, err = GetWorldLogoBySrcKey(ctx, "key1")
+	require.NoError(t, err)
+	require.Equal(t, id, rec.Id)
+	require.Equal(t, "name 1", rec.Name)
+	require.Equal(t, "logo url 1", rec.LogoPath)
+	require.Equal(t, "key1", rec.SrcKey)
+
 	err = DeleteWorldLogo(ctx, id)
 	require.NoError(t, err)
 	_, err = GetWorldLogoById(ctx, id)

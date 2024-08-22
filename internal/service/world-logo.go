@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 
 	"ext-data-domain/internal/model"
 	sq "ext-data-domain/internal/service/query"
@@ -85,6 +84,17 @@ func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, inp
 	}
 
 	return *input.Id, storage.DoTransactionAction(ctx, s.initTx, func(ctx context.Context) (err error) {
+		// overwrite id if src_key exists
+		rec, err := sq.GetWorldLogoBySrcKey(ctx, input.SrcKey)
+		if err != nil {
+			if !isStorageNotFoundErr(err) {
+				return fromStorageErr(err)
+			}
+		}
+		if rec.Id != "" {
+			input.Id = &rec.Id
+		}
+		// upload logo file if exists, and update the path. name of the file is the worldlogo/{id}.svg
 		if err = s.doUploadLogo(ctx, &input); err != nil {
 			return err
 		}
@@ -157,14 +167,9 @@ func (s *WorldLogoService) GetWorldLogosCount(ctx context.Context, ops model.Wor
 }
 
 func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLogoInput) error {
-	repl := strings.NewReplacer(" ", "_", "*", "_", "\\", "_", "-", "_", "/", "_", "'", "_", "\"", "_", "+", "_", "(", "_", ")", "_", "[", "_", "]", "_", "{", "_", "}", "_", "<", "_", ">", "_", "=", "_", "!", "_", "@", "_", "#", "_", "$", "_", "%", "_", "^", "_", "&", "_", "*", "_", ":", "_", ";", "_", ",", "_", ".", "_", "?", "_", "|", "_", "~", "_", "`", "_")
-	name := repl.Replace(item.Name)
-
-	timePfx := time.Now().UnixNano()
-	// ValuePropositionImage
 	if item.LogoBase64Str != nil {
 		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoBase64Str)))
-		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s_%d.svg", name, timePfx), source, "image/svg+xml")
+		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s.svg", *item.Id), source, "image/svg+xml")
 		if err != nil {
 			return ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_data": err.Error()})
 		}
