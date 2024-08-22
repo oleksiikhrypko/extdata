@@ -63,7 +63,7 @@ func sendToAPI(apiAddr, apikey, name, key, img string) error {
 	rec := api.WorldLogoInput{
 		Name:          name,
 		SrcKey:        key,
-		LogoBase64Str: &img,
+		LogoBase64Str: img,
 	}
 	data, err := json.Marshal(rec)
 	if err != nil {
