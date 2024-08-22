@@ -7,6 +7,8 @@ servers:
     description: Local server
   - url: https://ext-data-domain.dev.slyngshot.io/api/
     description: Dev server
+  - url: https://ext-data-domain.prod.slyngshot.io/api/
+    description: Dev server
 paths:
 #world-logo
   /world-logo/:

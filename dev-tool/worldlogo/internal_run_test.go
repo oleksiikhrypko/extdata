@@ -41,5 +41,6 @@ func Test_SendData(t *testing.T) {
 
 	// err := WriteDataFromCSVToAPI("./data/worldlogo.csv", "http://localhost:8080")
 	err := WriteDataFromCSVToAPI("./data/worldlogo_dev.csv", "https://ext-data-domain.dev.slyngshot.io", apikey)
+	// err := WriteDataFromCSVToAPI("./data/worldlogo.csv", "https://ext-data-domain.prod.slyngshot.io", apikey)
 	require.NoError(t, err)
 }

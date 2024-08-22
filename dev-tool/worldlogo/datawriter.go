@@ -30,6 +30,7 @@ func WriteDataFromCSVToAPI(filename, apiAddr, apikey string) error {
 			}
 			return err
 		}
+		fmt.Println(record)
 		// download image
 		img, err := downloadImage(record[2])
 		if err != nil {
