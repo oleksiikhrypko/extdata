@@ -22,7 +22,6 @@ func WriteDataFromCSVToAPI(filename, apiAddr string) error {
 	reader := csv.NewReader(file)
 	// Name Key Src
 	var record []string
-	i := 0
 	for {
 		record, err = reader.Read()
 		if err != nil {
@@ -42,11 +41,7 @@ func WriteDataFromCSVToAPI(filename, apiAddr string) error {
 		if err != nil {
 			return fmt.Errorf("sendToAPI: %w", err)
 		}
-		if i == 3 {
-			break
-		}
 	}
-	return nil
 }
 
 func downloadImage(src string) ([]byte, error) {

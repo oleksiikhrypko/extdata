@@ -26,9 +26,7 @@ func Test_getData(t *testing.T) {
 			err = WriteToSCV("./data/worldlogo.csv", res)
 			require.NoError(t, err)
 			<-time.After(2 * time.Second)
-			break
 		}
-		break
 	}
 }
 
