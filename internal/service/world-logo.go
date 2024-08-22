@@ -164,7 +164,7 @@ func (s *WorldLogoService) doUploadLogo(ctx context.Context, item *model.WorldLo
 	// ValuePropositionImage
 	if item.LogoBase64Str != nil {
 		source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader([]byte(*item.LogoBase64Str)))
-		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("/worldlogo/%s_%d.svg", name, timePfx), source, "image/svg+xml")
+		propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s_%d.svg", name, timePfx), source, "image/svg+xml")
 		if err != nil {
 			return ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_data": err.Error()})
 		}
