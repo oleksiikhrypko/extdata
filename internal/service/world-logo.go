@@ -11,10 +11,10 @@ import (
 	"ext-data-domain/internal/model"
 	sq "ext-data-domain/internal/service/query"
 
-	"github.com/Slyngshot-Team/packages/log"
-	"github.com/Slyngshot-Team/packages/storage"
-	"github.com/Slyngshot-Team/packages/storage/psql"
 	"github.com/oklog/ulid/v2"
+	"github.com/slyngshot-al/packages/log"
+	"github.com/slyngshot-al/packages/storage"
+	"github.com/slyngshot-al/packages/storage/psql"
 )
 
 type WorldLogoServiceConfig struct {

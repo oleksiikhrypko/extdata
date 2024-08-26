@@ -8,5 +8,5 @@ on:
 
 jobs:
   release:
-    uses: Slyngshot-Team/github-shared-actions/.github/workflows/helm-release-to-qa-uat.yaml@main
+    uses: slyngshot-al/github-shared-actions/.github/workflows/helm-release-to-qa-uat.yaml@main
     secrets: inherit

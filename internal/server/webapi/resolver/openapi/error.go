@@ -8,10 +8,10 @@ import (
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 	"ext-data-domain/internal/service"
 
-	"github.com/Slyngshot-Team/packages/xerrors"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
+	"github.com/slyngshot-al/packages/xerrors"
 )
 
 func bindError(c echo.Context, err error) error {

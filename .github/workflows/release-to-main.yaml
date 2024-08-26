@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    uses: Slyngshot-Team/github-shared-actions/.github/workflows/helm-release-to-main.yaml@main
+    uses: slyngshot-al/github-shared-actions/.github/workflows/helm-release-to-main.yaml@main
     secrets: inherit
     with:
-      go_version: 1.21.5
+      go_version: 1.23.0

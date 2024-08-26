@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/Slyngshot-Team/packages/auth"
+	"github.com/slyngshot-al/packages/auth"
 )
 
 type Session struct {

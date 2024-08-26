@@ -18,7 +18,7 @@ on:
 
 jobs:
   create-tag:
-    uses: Slyngshot-Team/github-shared-actions/.github/workflows/release-qa-uat-prod-with-help-button.yaml@main
+    uses: slyngshot-al/github-shared-actions/.github/workflows/release-qa-uat-prod-with-help-button.yaml@main
     secrets: inherit
     with:
       tag_name: ${{ inputs.tag_name }}

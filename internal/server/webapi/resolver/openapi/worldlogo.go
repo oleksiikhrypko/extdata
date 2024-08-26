@@ -6,10 +6,10 @@ import (
 	"ext-data-domain/internal/model"
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 
-	"github.com/Slyngshot-Team/packages/auth"
-	"github.com/Slyngshot-Team/packages/log"
-	"github.com/Slyngshot-Team/packages/storage/psql"
 	echo "github.com/labstack/echo/v4"
+	"github.com/slyngshot-al/packages/auth"
+	"github.com/slyngshot-al/packages/log"
+	"github.com/slyngshot-al/packages/storage/psql"
 )
 
 func (h Handler) GetWorldLogoById(c echo.Context, id api.IdParam) error {

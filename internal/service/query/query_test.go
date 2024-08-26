@@ -8,10 +8,10 @@ import (
 
 	"ext-data-domain/internal/model"
 
-	"github.com/Slyngshot-Team/packages/storage"
-	"github.com/Slyngshot-Team/packages/storage/psql"
 	"github.com/jmoiron/sqlx"
 	"github.com/oklog/ulid/v2"
+	"github.com/slyngshot-al/packages/storage"
+	"github.com/slyngshot-al/packages/storage/psql"
 	"github.com/stretchr/testify/require"
 )
 

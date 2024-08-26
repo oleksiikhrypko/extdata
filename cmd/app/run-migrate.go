@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/Slyngshot-Team/packages/log"
-	psql "github.com/Slyngshot-Team/packages/storage/psql"
 	"github.com/alecthomas/kingpin/v2"
+	"github.com/slyngshot-al/packages/log"
+	psql "github.com/slyngshot-al/packages/storage/psql"
 )
 
 func addMigrateCmd(ctx context.Context, app *kingpin.Application) {

@@ -1,6 +1,6 @@
 global:
   image:
-    repository: 837223769016.dkr.ecr.us-east-2.amazonaws.com/slyngshot-team/ext-data-domain
+    repository: 837223769016.dkr.ecr.us-east-2.amazonaws.com/slyngshot-al/ext-data-domain
     pullPolicy: IfNotPresent
 
   envs:

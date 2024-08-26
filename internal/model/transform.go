@@ -7,7 +7,7 @@ import (
 	graph "ext-data-domain/internal/server/webapi/api/graph/model"
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 
-	"github.com/Slyngshot-Team/packages/storage/psql"
+	"github.com/slyngshot-al/packages/storage/psql"
 )
 
 func Ptr[T any](v T) *T {

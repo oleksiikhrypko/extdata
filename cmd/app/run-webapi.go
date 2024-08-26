@@ -9,13 +9,13 @@ import (
 	"ext-data-domain/internal/server/webapi/resolver/openapi"
 	"ext-data-domain/internal/service"
 
-	"github.com/Slyngshot-Team/packages/auth"
-	"github.com/Slyngshot-Team/packages/config"
-	"github.com/Slyngshot-Team/packages/filestorage/awss3"
-	"github.com/Slyngshot-Team/packages/log"
-	psrv "github.com/Slyngshot-Team/packages/service"
-	"github.com/Slyngshot-Team/packages/storage/psql"
 	"github.com/alecthomas/kingpin/v2"
+	"github.com/slyngshot-al/packages/auth"
+	"github.com/slyngshot-al/packages/config"
+	"github.com/slyngshot-al/packages/filestorage/awss3"
+	"github.com/slyngshot-al/packages/log"
+	psrv "github.com/slyngshot-al/packages/service"
+	"github.com/slyngshot-al/packages/storage/psql"
 )
 
 func addWebapiCmd(ctx context.Context, root *kingpin.CmdClause) {

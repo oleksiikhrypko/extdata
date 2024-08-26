@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/Slyngshot-Team/packages/log"
+	"github.com/slyngshot-al/packages/log"
 )
 
 const logConfigTag = "log"

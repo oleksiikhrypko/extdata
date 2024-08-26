@@ -1,9 +1,9 @@
 package webapi
 
 import (
-	"github.com/Slyngshot-Team/packages/log"
 	"github.com/labstack/echo/v4"
 	echomw "github.com/labstack/echo/v4/middleware"
+	"github.com/slyngshot-al/packages/log"
 )
 
 const defaultStackSize = 4 << 10 // 4KB

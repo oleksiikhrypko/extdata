@@ -7,9 +7,9 @@ import (
 	"ext-data-domain/internal/server/webapi/resolver/graph"
 	"ext-data-domain/internal/server/webapi/resolver/openapi"
 
-	"github.com/Slyngshot-Team/packages/log"
-	"github.com/Slyngshot-Team/packages/service"
 	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/slyngshot-al/packages/log"
+	"github.com/slyngshot-al/packages/service"
 	// echotrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/labstack/echo.v4"
 )
 

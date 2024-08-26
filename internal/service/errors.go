@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"github.com/Slyngshot-Team/packages/storage"
-	"github.com/Slyngshot-Team/packages/xerrors"
+	"github.com/slyngshot-al/packages/storage"
+	"github.com/slyngshot-al/packages/xerrors"
 )
 
 var (

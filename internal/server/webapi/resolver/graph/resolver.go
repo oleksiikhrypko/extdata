@@ -15,10 +15,10 @@ import (
 	gqllru "github.com/99designs/gqlgen/graphql/handler/lru"
 	gqltransport "github.com/99designs/gqlgen/graphql/handler/transport"
 	gqlplayground "github.com/99designs/gqlgen/graphql/playground"
-	"github.com/Slyngshot-Team/packages/storage/psql"
-	"github.com/Slyngshot-Team/packages/xerrors"
 	"github.com/gorilla/websocket"
 	echo "github.com/labstack/echo/v4"
+	"github.com/slyngshot-al/packages/storage/psql"
+	"github.com/slyngshot-al/packages/xerrors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 

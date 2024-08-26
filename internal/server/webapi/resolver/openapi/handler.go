@@ -8,12 +8,12 @@ import (
 	"ext-data-domain/internal/model"
 	api "ext-data-domain/internal/server/webapi/api/openapi"
 
-	"github.com/Slyngshot-Team/packages/storage/psql"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	echo "github.com/labstack/echo/v4"
 	echomw "github.com/labstack/echo/v4/middleware"
 	apimid "github.com/oapi-codegen/echo-middleware"
+	"github.com/slyngshot-al/packages/storage/psql"
 )
 
 // This file will not be regenerated automatically.

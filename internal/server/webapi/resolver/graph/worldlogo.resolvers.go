@@ -12,8 +12,8 @@ import (
 	apimodel "ext-data-domain/internal/server/webapi/api/graph/model"
 	"ext-data-domain/internal/service"
 
-	"github.com/Slyngshot-Team/packages/auth"
-	"github.com/Slyngshot-Team/packages/log"
+	"github.com/slyngshot-al/packages/auth"
+	"github.com/slyngshot-al/packages/log"
 )
 
 // WorldLogos is the resolver for the world_logos field.

@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Slyngshot-Team/packages/log"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	echo "github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/slyngshot-al/packages/log"
 )
 
 var initialized bool

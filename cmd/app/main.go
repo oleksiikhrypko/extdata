@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/Slyngshot-Team/packages/config"
-	"github.com/Slyngshot-Team/packages/log"
-	srvutil "github.com/Slyngshot-Team/packages/service"
 	"github.com/alecthomas/kingpin/v2"
+	"github.com/slyngshot-al/packages/config"
+	"github.com/slyngshot-al/packages/log"
+	srvutil "github.com/slyngshot-al/packages/service"
 )
 
 var Version = "Not set" //nolint:gochecknoglobals
