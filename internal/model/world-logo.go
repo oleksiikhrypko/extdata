@@ -22,6 +22,8 @@ type SaveWorldLogoInput struct {
 	SrcKey        string
 	Name          string
 	LogoBase64Str string
+	ContentType   string
+	FileExtension string
 }
 
 type WorldLogosQueryOptions struct {

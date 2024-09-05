@@ -183,13 +183,24 @@ components:
         - src_key
         - name
         - logo_base64_str
+        - content_type
+        - file_extension
       properties:
         src_key:
           type: string
+          description: The source key of the world logo record
         name:
           type: string
+          description: The name of the world logo record
         logo_base64_str:
           type: string
+          description: The base64 encoded string of the logo
+        content_type:
+          type: string
+          description: The content type of the logo, like image/svg+xml, image/png, image/jpeg, etc.
+        file_extension:
+          type: string
+          description: The file extension of the logo, like svg, png, jpg, jpeg, etc.
 
   parameters:
     api-key:

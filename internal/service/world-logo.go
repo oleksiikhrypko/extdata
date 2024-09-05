@@ -77,7 +77,13 @@ func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, inp
 		return "", ErrInvalidParams.WithMessage("'name' must be provided")
 	}
 	if len(input.LogoBase64Str) == 0 {
-		return "", ErrInvalidParams.WithMessage("either 'logo_base64_str' must be provided")
+		return "", ErrInvalidParams.WithMessage("'logo_base64_str' must be provided")
+	}
+	if len(input.ContentType) == 0 {
+		return "", ErrInvalidParams.WithMessage("'content_type' must be provided")
+	}
+	if len(input.FileExtension) == 0 {
+		return "", ErrInvalidParams.WithMessage("'file_extension' must be provided")
 	}
 
 	ctx = log.CtxWithValues(ctx, "action", "SaveWorldLogo", "name", input.Name, "key", input.SrcKey)
@@ -102,7 +108,7 @@ func (s *WorldLogoService) SaveWorldLogo(ctx context.Context, apiKey string, inp
 		}
 
 		// upload logo file
-		path, err := s.doUploadLogo(ctx, rec.Id, []byte(input.LogoBase64Str))
+		path, err := s.doUploadLogo(ctx, fmt.Sprintf("worldlogo/%s.%s", rec.Id, input.FileExtension), input.ContentType, []byte(input.LogoBase64Str))
 		if err != nil {
 			return err
 		}
@@ -177,9 +183,9 @@ func (s *WorldLogoService) GetWorldLogosCount(ctx context.Context, ops model.Wor
 	return count, fromStorageErr(err)
 }
 
-func (s *WorldLogoService) doUploadLogo(ctx context.Context, name string, data []byte) (path string, err error) {
+func (s *WorldLogoService) doUploadLogo(ctx context.Context, name string, contentType string, data []byte) (path string, err error) {
 	source := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(data))
-	propImage, err := s.fileStorage.Upload(ctx, fmt.Sprintf("worldlogo/%s", name), source, "")
+	propImage, err := s.fileStorage.Upload(ctx, name, source, contentType)
 	if err != nil {
 		return "", ErrInternal.Consume(err).WithAdditionalInfo("failed to upload file", map[string]any{"logo_base64_str": err.Error()})
 	}

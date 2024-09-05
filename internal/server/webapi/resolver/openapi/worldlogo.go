@@ -78,6 +78,8 @@ func (h Handler) CreateWorldLogo(c echo.Context, params api.CreateWorldLogoParam
 		Name:          input.Name,
 		LogoBase64Str: input.LogoBase64Str,
 		SrcKey:        input.SrcKey,
+		ContentType:   input.ContentType,
+		FileExtension: input.FileExtension,
 	})
 	if err != nil {
 		return handleError(c, err)

@@ -42,7 +42,7 @@ func WriteDataFromCSVToAPI(filename, apiAddr, apikey string) error {
 
 		imgStr := base64.StdEncoding.EncodeToString(img)
 		// send to api
-		err = sendToAPI(apiAddr, apikey, record[0], record[1], imgStr)
+		err = sendToAPI(apiAddr, apikey, record[0], record[1], imgStr, "image/svg+xml", "svg")
 		if err != nil {
 			return fmt.Errorf("failed key %s: %s", record[1], err)
 		}
@@ -62,11 +62,13 @@ func downloadImage(src string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func sendToAPI(apiAddr, apikey, name, key, img string) error {
+func sendToAPI(apiAddr, apikey, name, key, img, contentType, fileExtension string) error {
 	rec := api.WorldLogoInput{
 		Name:          name,
 		SrcKey:        key,
 		LogoBase64Str: img,
+		ContentType:   contentType,
+		FileExtension: fileExtension,
 	}
 	data, err := json.Marshal(rec)
 	if err != nil {
